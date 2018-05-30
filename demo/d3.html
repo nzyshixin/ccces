@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="{CHARSET}">
+		<title></title>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.4.1/d3.min.js"></script>
+		<style>
+			/*.chart div {
+		  font: 10px sans-serif;
+		  background-color: steelblue;
+		  text-align: right;
+		  padding: 3px;
+		  margin: 1px;
+		  color: white;
+		}*/
+		
+		/*circle {
+  color: black;
+}*/
+
+
+.axis path,
+	.axis line{
+		fill: none;
+		stroke: black;
+		shape-rendering: crispEdges;
+	}
+
+	.axis text {
+		font-family: sans-serif;
+		font-size: 11px;
+	}
+
+	.MyRect {
+		fill: steelblue;
+	}
+
+	.MyText {
+		fill: white;
+		text-anchor: middle;
+	}
+
+		</style>
+	</head>
+
+	<body>
+		<!--<svg width="720" height="120">
+		  <circle cx="40" cy="60" r="10"></circle>
+		  <circle cx="80" cy="60" r="10"></circle>
+		  <circle cx="120" cy="60" r="10"></circle>
+		</svg>-->
+
+		<!--<div class="chart">
+		  <div style="width: 40px;">4</div>
+		  <div style="width: 80px;">8</div>
+		  <div style="width: 150px;">15</div>
+		  <div style="width: 160px;">16</div>
+		  <div style="width: 230px;">23</div>
+		  <div style="width: 420px;">42</div>
+		</div>-->
+		<div id="graph">
+</div>
+	</body>
+	<script type="text/javascript">
+		
+		
+		document.onkeydown = function (e) {
+            var ev = window.event || e;
+            var code = ev.keyCode || ev.which;
+            if (code == 116) {
+                ev.keyCode ? ev.keyCode = 0 : ev.which = 0;
+                cancelBubble = true;
+                return false;
+            }
+        } //禁止f5刷新
+document.oncontextmenu=function(){return false};//禁止右键刷新
+		
+		//		var circle = d3.selectAll("circle");
+		//		circle.style("fill", "steelblue");
+		//		circle.attr("r", 30);
+		////		circle.attr("cx", function() { return Math.random() * 720; });
+		//		circle.data([32, 57, 112]);
+		//		circle.attr("r", function(d) { return Math.sqrt(d); });
+		//		circle.attr("cx", function(d, i) { return i * 100 + 30; });
+
+		//		var svg = d3.select("svg");
+		//
+		//var circle = svg.selectAll("circle")
+		//  .data([32, 57]);
+		//
+		//var circleEnter = circle.enter().append("circle");
+		//
+		//circleEnter.attr("cy", 60);
+		//circleEnter.attr("cx", function(d, i) { return i * 100 + 30; });
+		//circleEnter.attr("r", function(d) { return Math.sqrt(d); });
+		//circle.exit().remove();
+
+//		
+//		var vis = d3.select("#graph")
+//          .append("svg");
+//           var w = 900,
+//       h = 400;
+//   vis.attr("width", w)
+//      .attr("height", h);
+//      vis.text("The Graph")
+//      .select("#graph")
+//      var nodes = [{x: 300, y: 50},
+//            {x: 500, y: 80},
+//            {x: 90, y: 120}]
+//       vis.selectAll("circle .nodes")
+//    .data(nodes)
+//    .enter()
+//    .append("svg:circle")
+//    .attr("class", "nodes")
+//    .attr("cx", function(d) { return d.x; })
+//    .attr("cy", function(d) { return d.y; })
+//    .attr("r", "10px")
+//    .attr("fill", "black") 
+//     var links = [
+//{source: nodes[0], target: nodes[1]},
+//{source: nodes[2], target: nodes[1]}
+//] 
+//      
+//      vis.selectAll(".line")
+// .data(links)
+// .enter()
+// .append("line")
+// .attr("x1", function(d) { return d.source.x })
+// .attr("y1", function(d) { return d.source.y })
+// .attr("x2", function(d) { return d.target.x })
+// .attr("y2", function(d) { return d.target.y })
+// .style("stroke", "rgb(6,120,155)");
+
+
+
+
+	//画布大小
+	var width = 400;
+	var height = 400;
+
+	//在 body 里添加一个 SVG 画布	
+	var svg = d3.select("body")
+		.append("svg")
+		.attr("width", width)
+		.attr("height", height);
+
+	//画布周边的空白
+	var padding = {left:30, right:30, top:20, bottom:20};
+
+	//定义一个数组
+	var dataset = [10, 20, 30, 40, 33, 24, 12, 5];
+		
+	//x轴的比例尺
+	var xScale = d3.scale.ordinal()
+		.domain(d3.range(dataset.length))
+		.rangeRoundBands([0, width - padding.left - padding.right]);
+
+	//y轴的比例尺
+	var yScale = d3.scale.linear()
+		.domain([0,d3.max(dataset)])
+		.range([height - padding.top - padding.bottom, 0]);
+
+	//定义x轴
+	var xAxis = d3.svg.axis()
+		.scale(xScale)
+		.orient("bottom");
+		
+	//定义y轴
+	var yAxis = d3.svg.axis()
+		.scale(yScale)
+		.orient("left");
+
+	//矩形之间的空白
+	var rectPadding = 4;
+
+	//添加矩形元素
+	var rects = svg.selectAll(".MyRect")
+		.data(dataset)
+		.enter()
+		.append("rect")
+		.attr("class","MyRect")
+		.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+		.attr("x", function(d,i){
+			return xScale(i) + rectPadding/2;
+		} )
+		.attr("width", xScale.rangeBand() - rectPadding )
+		.attr("y",function(d){
+			var min = yScale.domain()[0];
+			return yScale(min);
+		})
+		.attr("height", function(d){
+			return 0;
+		})
+		.transition()
+		.delay(function(d,i){
+			return i * 200;
+		})
+		.duration(2000)
+		.ease("bounce")
+		.attr("y",function(d){
+			return yScale(d);
+		})
+		.attr("height", function(d){
+			return height - padding.top - padding.bottom - yScale(d);
+		});
+
+	//添加文字元素
+	var texts = svg.selectAll(".MyText")
+		.data(dataset)
+		.enter()
+		.append("text")
+		.attr("class","MyText")
+		.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+		.attr("x", function(d,i){
+			return xScale(i) + rectPadding/2;
+		} )
+		.attr("dx",function(){
+			return (xScale.rangeBand() - rectPadding)/2;
+		})
+		.attr("dy",function(d){
+			return 20;
+		})
+		.text(function(d){
+			return d;
+		})
+		.attr("y",function(d){
+			var min = yScale.domain()[0];
+			return yScale(min);
+		})
+		.transition()
+		.delay(function(d,i){
+			return i * 200;
+		})
+		.duration(2000)
+		.ease("bounce")
+		.attr("y",function(d){
+			return yScale(d);
+		});
+
+	//添加x轴
+	svg.append("g")
+		.attr("class","axis")
+		.attr("transform","translate(" + padding.left + "," + (height - padding.bottom) + ")")
+		.call(xAxis); 
+		
+	//添加y轴
+	svg.append("g")
+		.attr("class","axis")
+		.attr("transform","translate(" + padding.left + "," + padding.top + ")")
+		.call(yAxis);
+
+        
+	</script>
+
+</html>
